@@ -1,0 +1,6 @@
+{
+  "version": "1.0.1",
+  "download_url": "https://github.com/tuousername/timbracart/releases/download/v1.0.1/Timbracart.exe",
+  "changelog": "- Risolto bug eliminazione personaggi\n- Migliorata interfaccia bacheca\n- Ottimizzazioni prestazioni",
+  "mandatory": false
+}

@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.0.0/BadgeEmpire.exe",
   "changelog": "- Immagine personaggio ora visibile nella bacheca\n- Nome personaggio spostato sopra l'immagine\n- Migliorato layout e design della bacheca\n- Gestione errori migliorata per immagini",
   "mandatory": false

@@ -11,8 +11,8 @@ import subprocess
 from pathlib import Path
 
 # Configurazione
-UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tuousername/timbracart/main/version.json"
-APP_NAME = "Timbracart.exe"
+UPDATE_CHECK_URL = "https://raw.githubusercontent.com/ImKshakvs/BadgeEmpire/main/version.json"
+APP_NAME = "BadgeEmpire.exe"
 
 def download_file(url, destination):
     """Scarica un file con barra di progresso"""

@@ -11,12 +11,6 @@ from functools import partial
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import subprocess
-
-# VERSIONE DELL'APP (cambia ad ogni release)
-APP_VERSION = "1.0.0"
-UPDATE_CHECK_URL = "https://raw.githubusercontent.com/tuousername/timbracart/main/version.json"
-
 # --- Configurazione Globale ---
 SERVER_HOST = "100.64.205.34"
 SERVER_PORT = 5000
@@ -108,6 +102,12 @@ QLineEdit, QTableWidget, QTextEdit, QListWidget, QComboBox {
     max-width: 40px;
 }
 """
+
+import subprocess
+
+# VERSIONE DELL'APP (cambia ad ogni release)
+APP_VERSION = "1.0.0"
+UPDATE_CHECK_URL = "https://raw.githubusercontent.com/ImKshakvs/BadgeEmpire/main/version.json"
 
 # --- Funzioni Helper ---
 def compare_versions(v1, v2):
@@ -886,25 +886,41 @@ if PYQT_AVAILABLE:
             left = QVBoxLayout()
             right = QVBoxLayout()
 
-            self_img = QLabel()
-            self_img.setFixedSize(320,320)
-            self_img.setAlignment(QtCore.Qt.AlignCenter)
-            self_img.setObjectName(f'img_label_{series_title}')
+            # Label per il nome (sopra l'immagine)
             name_lbl = QLabel('')
             name_lbl.setObjectName(f'name_{series_title}')
             name_lbl.setAlignment(QtCore.Qt.AlignCenter)
-            name_lbl.setStyleSheet('font-size:20px; font-weight:bold;')
+            name_lbl.setStyleSheet('font-size:22px; font-weight:bold; color:#2c3e50; margin-bottom: 10px;')
 
+            # Label per l'immagine (grande, centrata)
+            self_img = QLabel()
+            self_img.setFixedSize(320, 320)
+            self_img.setAlignment(QtCore.Qt.AlignCenter)
+            self_img.setObjectName(f'img_label_{series_title}')
+            self_img.setStyleSheet('''
+                QLabel {
+                    border: 2px solid #bdc3c7;
+                    border-radius: 8px;
+                    background-color: #ecf0f1;
+                }
+            ''')
+
+            # Aggiungi nome e immagine al layout sinistro
             left.addWidget(name_lbl)
             left.addWidget(self_img)
+            left.addSpacing(10)
 
+            # Pannello destro con informazioni
             btn_script = QPushButton('Apri/Scarica Copione')
             btn_script.clicked.connect(lambda _, s=series_title: self.download_script(s))
             
             expiry = QLabel('Scadenza: -')
             expiry.setObjectName(f'expiry_{series_title}')
+            expiry.setStyleSheet('font-size:14px; padding:5px;')
+            
             role = QLabel('Ruolo: -')
             role.setObjectName(f'role_{series_title}')
+            role.setStyleSheet('font-size:14px; padding:5px;')
 
             btn_upload_mov = QPushButton('Carica .mov')
             btn_upload_mov.clicked.connect(lambda _, s=series_title: self.upload_mov(s))
@@ -988,21 +1004,39 @@ if PYQT_AVAILABLE:
                 if img_label: img_label.clear()
                 return
             
-            if name_lbl: name_lbl.setText(item['character_name'])
+            # Mostra nome sotto l'immagine con stile migliorato
+            if name_lbl: 
+                name_lbl.setText(item['character_name'])
+            
             if expiry_lbl: expiry_lbl.setText('Scadenza: ' + (item.get('expiry_date') or '-'))
             if role_lbl: role_lbl.setText('Ruolo: ' + (item.get('role') or '-'))
             
+            # Carica e mostra l'immagine del personaggio
             if img_label and item.get('image_url'):
                 try:
+                    print(f"[BACHECA] Caricamento immagine: {item['image_url']}")
                     data = requests.get(item['image_url'], timeout=6).content
                     pix = QtGui.QPixmap()
-                    pix.loadFromData(data)
-                    pix = pix.scaled(img_label.width(), img_label.height(), QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                    img_label.setPixmap(pix)
-                except Exception:
-                    img_label.clear()
+                    if pix.loadFromData(data):
+                        # Scala l'immagine mantenendo le proporzioni
+                        pix = pix.scaled(img_label.width(), img_label.height(), 
+                                       QtCore.Qt.KeepAspectRatio, 
+                                       QtCore.Qt.SmoothTransformation)
+                        img_label.setPixmap(pix)
+                        print(f"[BACHECA] Immagine caricata con successo per {item['character_name']}")
+                    else:
+                        print(f"[BACHECA] Impossibile caricare l'immagine per {item['character_name']}")
+                        img_label.setText("Immagine\nnon disponibile")
+                        img_label.setStyleSheet("color: #999; font-size: 12px;")
+                except Exception as e:
+                    print(f"[BACHECA] Errore caricamento immagine: {e}")
+                    img_label.setText("Errore\ncaricamento")
+                    img_label.setStyleSheet("color: #ff0000; font-size: 12px;")
             else:
-                if img_label: img_label.clear()
+                if img_label: 
+                    img_label.clear()
+                    img_label.setText("Nessuna\nimmagine")
+                    img_label.setStyleSheet("color: #999; font-size: 12px;")
 
         def change_index(self, series, delta):
             if not self.characters.get(series): return
@@ -1268,12 +1302,6 @@ if PYQT_AVAILABLE:
             layout.addWidget(btn_login)
             layout.addWidget(btn_register)
             self.setLayout(layout)
-            QtCore.QTimer.singleShot(2000, self.check_updates)
-
-        def check_updates(self):
-            update_info = check_for_updates()
-            if update_info:
-                show_update_dialog(self, update_info)
 
         def login(self):
             code = self.code_input.text()
@@ -1297,6 +1325,13 @@ if PYQT_AVAILABLE:
         def register(self):
             dlg = RegisterDialog(self.server_url, parent=self)
             dlg.exec_()
+            QtCore.QTimer.singleShot(2000, self.check_updates)
+    
+        def check_updates(self):
+            """Controlla aggiornamenti all'avvio"""
+            update_info = check_for_updates()
+            if update_info:
+                show_update_dialog(self, update_info)
 
     class MainWindow(QMainWindow):
         def __init__(self, user, server_url):

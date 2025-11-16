@@ -106,7 +106,7 @@ QLineEdit, QTableWidget, QTextEdit, QListWidget, QComboBox {
 import subprocess
 
 # VERSIONE DELL'APP (cambia ad ogni release)
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.2"
 UPDATE_CHECK_URL = "https://raw.githubusercontent.com/ImKshakvs/BadgeEmpire/main/version.json"
 
 # --- Funzioni Helper ---
@@ -208,45 +208,129 @@ def show_update_dialog(parent, update_info):
 
 
 def start_updater():
-    """Avvia updater.py"""
+    """Crea e avvia lo script updater temporaneo"""
     try:
-        # Trova il path di updater.py
+        # Determina directory corrente
         if getattr(sys, 'frozen', False):
-            # Se siamo in un eseguibile
             base_dir = os.path.dirname(sys.executable)
+            current_exe = sys.executable
         else:
-            # Se siamo in sviluppo
             base_dir = os.path.dirname(os.path.abspath(__file__))
+            current_exe = os.path.abspath(__file__)
         
-        updater_path = os.path.join(base_dir, "updater.py")
+        print(f"[UPDATE] Directory: {base_dir}")
+        print(f"[UPDATE] Eseguibile: {current_exe}")
         
-        if not os.path.exists(updater_path):
-            QMessageBox.warning(None, "Errore", f"File updater.py non trovato in:\n{updater_path}")
-            return
+        # Crea lo script updater temporaneo
+        updater_script = f'''
+import time
+import os
+import sys
+import requests
+import shutil
+import subprocess
+
+print("=" * 60)
+print("   TIMBRACART AUTO-UPDATER")
+print("=" * 60)
+
+UPDATE_CHECK_URL = "{UPDATE_CHECK_URL}"
+APP_NAME = "Timbracart.exe"
+
+try:
+    # Aspetta chiusura app
+    print("\\n[1/5] Attesa chiusura applicazione...")
+    time.sleep(3)
+    
+    # Controlla aggiornamenti
+    print("[2/5] Controllo aggiornamenti...")
+    response = requests.get(UPDATE_CHECK_URL, timeout=10)
+    update_info = response.json()
+    download_url = update_info['download_url']
+    latest_version = update_info['version']
+    
+    print(f"[2/5] Scaricamento versione {{latest_version}}...")
+    
+    # Scarica nuova versione
+    print("[3/5] Download in corso...")
+    temp_file = "Timbracart_new.exe"
+    response = requests.get(download_url, stream=True, timeout=30)
+    total_size = int(response.headers.get('content-length', 0))
+    downloaded = 0
+    
+    with open(temp_file, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
+                downloaded += len(chunk)
+                if total_size > 0:
+                    progress = (downloaded / total_size) * 100
+                    bar_length = 50
+                    filled = int(bar_length * downloaded / total_size)
+                    bar = '█' * filled + '░' * (bar_length - filled)
+                    print(f"\\r      [{{bar}}] {{progress:.1f}}%", end='')
+    
+    print("\\n[3/5] Download completato!")
+    
+    # Backup e sostituzione
+    print("[4/5] Installazione aggiornamento...")
+    current_exe = "{current_exe}"
+    backup_file = current_exe + ".old"
+    
+    if os.path.exists(backup_file):
+        os.remove(backup_file)
+    
+    if os.path.exists(current_exe):
+        os.rename(current_exe, backup_file)
+    
+    shutil.move(temp_file, current_exe)
+    
+    print("[5/5] Riavvio applicazione...")
+    time.sleep(1)
+    
+    # Riavvia app
+    subprocess.Popen([current_exe])
+    
+    print("\\n✅ Aggiornamento completato!")
+    time.sleep(2)
+    
+    # Pulisci script
+    try:
+        os.remove(__file__)
+    except:
+        pass
+    
+except Exception as e:
+    print(f"\\n❌ ERRORE: {{e}}")
+    
+    # Ripristina backup
+    if os.path.exists(backup_file) and not os.path.exists(current_exe):
+        os.rename(backup_file, current_exe)
+    
+    print("\\nPremi INVIO per chiudere...")
+    input()
+    sys.exit(1)
+'''
         
-        print(f"[UPDATE] Avvio updater: {updater_path}")
+        # Salva lo script updater
+        updater_path = os.path.join(base_dir, "_timbracart_updater.py")
+        with open(updater_path, 'w', encoding='utf-8') as f:
+            f.write(updater_script)
         
-        # Avvia updater.py in una nuova finestra
+        print(f"[UPDATE] Script updater creato: {updater_path}")
+        
+        # Avvia l'updater
         if sys.platform == 'win32':
-            # Windows: nuova finestra cmd
-            subprocess.Popen([
-                'cmd', '/c', 'start', 
-                'python', updater_path, 
-                APP_VERSION,  # Passa versione corrente
-                'yes'  # Aspetta che l'app si chiuda
-            ])
+            subprocess.Popen(['cmd', '/c', 'start', 'python', updater_path])
         else:
-            # Linux/Mac
-            subprocess.Popen([
-                sys.executable, updater_path,
-                APP_VERSION,
-                'yes'
-            ])
+            subprocess.Popen([sys.executable, updater_path])
         
         print("[UPDATE] Updater avviato. Chiusura app...")
         
     except Exception as e:
-        print(f"[UPDATE] Errore avvio updater: {e}")
+        print(f"[UPDATE] Errore: {e}")
+        import traceback
+        traceback.print_exc()
         QMessageBox.critical(None, "Errore", f"Impossibile avviare l'updater:\n{e}")
 
 def make_icon(name, size=24):
@@ -290,6 +374,33 @@ def init_db_bacheca(conn):
     )
     ''')
     conn.commit()
+
+def update_db_add_visibility():
+    """Aggiunge campo visible_to per gestire visibilità personaggi"""
+    conn = get_db_connection()
+    c = conn.cursor()
+    try:
+        c.execute('ALTER TABLE bacheca_characters ADD COLUMN visible_to TEXT')
+        conn.commit()
+        print("[DB] Colonna 'visible_to' aggiunta a bacheca_characters")
+    except sqlite3.OperationalError:
+        pass  # Colonna già esistente
+    finally:
+        conn.close()
+
+def update_db_add_assigned():
+    """Aggiunge campo assigned_to per assegnazione personaggio"""
+    conn = get_db_connection()
+    c = conn.cursor()
+    try:
+        c.execute('ALTER TABLE bacheca_characters ADD COLUMN assigned_to INTEGER')
+        conn.commit()
+        print("[DB] Colonna 'assigned_to' aggiunta a bacheca_characters")
+    except sqlite3.OperationalError:
+        pass  # Colonna già esistente
+    finally:
+        conn.close()
+
 
 def init_db():
     """Inizializzazione database"""
@@ -355,6 +466,8 @@ def init_db():
 
     init_db_bacheca(conn)
     conn.close()
+    update_db_add_visibility()
+    update_db_add_assigned()
 
 def _save_uploaded_file(fileobj, subdir, filename_prefix):
     if not fileobj:
@@ -369,74 +482,110 @@ def _save_uploaded_file(fileobj, subdir, filename_prefix):
     return os.path.relpath(dest_path, BASE_DIR)
 
 # --- ENDPOINTS FLASK ---
-@app.route('/bacheca/character', methods=['POST'])
-def api_bacheca_create_character():
-    if request is None: return jsonify({'status':'error','message':'Server not configured'}), 500
-    try:
-        series = request.form.get('series_title', 'After School')
-        name = request.form.get('character_name')
-        role = request.form.get('role','')
-        expiry = request.form.get('expiry_date')
-        script_text = request.form.get('script_text', '')
-        created_by = request.form.get('created_by')
-
-        if not name or not role:
-            return jsonify({'status':'error', 'message':'Nome e Ruolo obbligatori'}), 400
-
-        image_file = request.files.get('image_file')
-        img_rel = _save_uploaded_file(image_file, series, f"img_{secure_filename(name)}") if image_file else None
-        
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        conn = get_db_connection()
-        c = conn.cursor()
-        c.execute("INSERT INTO bacheca_characters (series_title, character_name, role, image_path, script_text, expiry_date, created_by, last_modified) VALUES (?,?,?,?,?,?,?,?)",
-                  (series, name, role, img_rel, script_text, expiry, created_by, now))
-        conn.commit()
-        conn.close()
-        
-        audit(created_by, 'bacheca_create', f"Character: {series}:{name}")
-        return jsonify({'status':'ok', 'message':f'Personaggio {name} creato', 'last_modified':now})
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({'status':'error','message':str(e)}), 500
-
-@app.route('/bacheca/last_update', methods=['GET'])
-def api_bacheca_last_update():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute("SELECT MAX(last_modified) FROM bacheca_characters")
-    row = c.fetchone()
-    conn.close()
-    last = row[0] if row and row[0] else ''
-    return jsonify({'last_update': last})
-
+    
 @app.route('/bacheca/characters', methods=['GET'])
 def api_bacheca_characters():
+    # ← AGGIUNTO: parametro opzionale user_id
+    user_id = request.args.get('user_id')  # Es: ?user_id=5
+    
     conn = get_db_connection()
     c = conn.cursor()
     c.execute("SELECT * FROM bacheca_characters ORDER BY series_title, character_name")
     rows = c.fetchall()
     conn.close()
+    
     out = []
     for r in rows:
         r = dict(r)
+        
+        # ← AGGIUNTO: Filtro per visibilità
+        visible_to = r.get('visible_to', '')
+        if visible_to:  # Se ha restrizioni di visibilità
+            allowed_users = [uid.strip() for uid in visible_to.split(',') if uid.strip()]
+            # Se user_id è specificato E non è nella lista → salta
+            if user_id and str(user_id) not in allowed_users:
+                continue
+        
+        # Resto del codice UGUALE
         v_ts = int(datetime.strptime(r['last_modified'], '%Y-%m-%d %H:%M:%S').timestamp()) if r.get('last_modified') else int(time.time())
         img_url = f"{SERVER_URL}/profile_image/{r['image_path']}?v={v_ts}" if r['image_path'] else None
         mov_url = f"{SERVER_URL}/profile_image/{r['mov_path']}?v={v_ts}" if r['mov_path'] else None
         script_url = f"{SERVER_URL}/profile_image/{r['script_path']}?v={v_ts}" if r['script_path'] else None
+        
         out.append({
             'id': r['id'],
             'series_title': r['series_title'],
             'character_name': r['character_name'],
             'role': r['role'],
             'image_url': img_url,
-            'script_text': r['script_text'],
+            'script_text': r.get('script_text'),
             'script_url': script_url,
-            'expiry_date': r['expiry_date'],
+            'expiry_date': r.get('expiry_date'),
             'mov_url': mov_url,
-            'last_modified': r['last_modified']
+            'last_modified': r.get('last_modified'),
+            'visible_to': r.get('visible_to',''),
+            'assigned_to': r.get('assigned_to')
         })
+
+    
     return jsonify(out)
+
+@app.route('/bacheca/character', methods=['POST'])
+def api_bacheca_create_character():
+    """Crea un nuovo personaggio (supporta form-data con file opzionali)"""
+    if request is None: return jsonify({'status':'error','message':'Server not configured'}), 500
+    try:
+        series = request.form.get('series_title') or request.form.get('series') or ''
+        name = request.form.get('character_name') or ''
+        role = request.form.get('role') or ''
+        expiry = request.form.get('expiry_date') or ''
+        created_by = request.form.get('created_by')
+        visible_to = request.form.get('visible_to','').strip()
+        assigned_to = request.form.get('assigned_to','').strip()
+
+        if not name or not role:
+            return jsonify({'status':'error','message':'Nome e ruolo obbligatori'}), 400
+
+        image_file = request.files.get('image_file')
+        script_file = request.files.get('script')
+        mov_file = request.files.get('mov')
+
+        conn = get_db_connection()
+        c = conn.cursor()
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        c.execute('INSERT INTO bacheca_characters (series_title, character_name, role, expiry_date, created_by, visible_to, last_modified, assigned_to) VALUES (?,?,?,?,?,?,?,?)',
+                  (series, name, role, expiry, created_by, visible_to, now, assigned_to))
+        conn.commit()
+        cid = c.lastrowid
+
+        updates = {}
+        if image_file:
+            img_rel = _save_uploaded_file(image_file, series, f"img_{secure_filename(name)}")
+            updates['image_path'] = img_rel
+        if script_file:
+            if not script_file.filename.endswith('.docx'):
+                c.execute('DELETE FROM bacheca_characters WHERE id=?', (cid,))
+                conn.commit()
+                conn.close()
+                return jsonify({'status':'error','message':'Il copione deve essere .docx'}), 400
+            script_rel = _save_uploaded_file(script_file, series, f"script_{secure_filename(name)}")
+            updates['script_path'] = script_rel
+        if mov_file:
+            mov_rel = _save_uploaded_file(mov_file, series, f"mov_{secure_filename(name)}")
+            updates['mov_path'] = mov_rel
+
+        if updates:
+            params = ', '.join([f"{k}=?" for k in updates.keys()]) + ', last_modified=?'
+            vals = list(updates.values()) + [now, cid]
+            c.execute(f"UPDATE bacheca_characters SET {params} WHERE id=?", vals)
+            conn.commit()
+        conn.close()
+        audit(created_by, 'bacheca_create', f"cid={cid}")
+        return jsonify({'status':'ok', 'id': cid})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'status':'error','message':str(e)}), 500
+
 
 @app.route('/bacheca/character/<int:cid>/delete', methods=['POST'])
 def api_bacheca_delete_character(cid):
@@ -686,6 +835,16 @@ def api_bacheca_download_mov(cid):
     if os.path.exists(mov_path):
         return send_file(mov_path, as_attachment=True, download_name=os.path.basename(mov_path))
     return jsonify({'status':'error','message':'File not found'}), 404
+
+@app.route('/get_all_users', methods=['GET'])
+def api_get_all_users():
+    """Ritorna lista di tutti gli utenti (per selezione visibilità)"""
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute("SELECT id, name, surname, email FROM users ORDER BY name")
+    rows = c.fetchall()
+    conn.close()
+    return jsonify([{'id': r[0], 'name': r[1], 'surname': r[2], 'email': r[3]} for r in rows])
 
 @app.route('/profile_image/<path:filename>')
 def serve_asset(filename):
@@ -953,7 +1112,10 @@ if PYQT_AVAILABLE:
 
         def load_characters(self):
             try:
-                r = requests.get(f"{self.server_url}/bacheca/characters", timeout=8)
+                # ← MODIFICATO: passa user_id per filtrare
+                user_id = str(self.user.get('id', ''))
+                r = requests.get(f"{self.server_url}/bacheca/characters?user_id={user_id}", timeout=8)
+        
                 if r.status_code == 200:
                     items = r.json()
                     groups = {}
@@ -961,7 +1123,7 @@ if PYQT_AVAILABLE:
                         groups.setdefault(it['series_title'], []).append(it)
                     self.characters['After School'] = groups.get('After School', [])
                     self.characters['Empire Office'] = groups.get('Empire Office', [])
-                    
+            
                     self.last_update = max([item.get('last_modified') for item in items if item.get('last_modified')] or [''], default=None)
 
                     self.refresh_current_view('After School')
@@ -1303,6 +1465,9 @@ if PYQT_AVAILABLE:
             layout.addWidget(btn_register)
             self.setLayout(layout)
 
+            print(f"[INIT] LoginWindow inizializzata. Versione: {APP_VERSION}")
+            QtCore.QTimer.singleShot(2000, self.check_updates)
+
         def login(self):
             code = self.code_input.text()
             pw = self.pw_input.text()
@@ -1325,15 +1490,70 @@ if PYQT_AVAILABLE:
         def register(self):
             dlg = RegisterDialog(self.server_url, parent=self)
             dlg.exec_()
-            QtCore.QTimer.singleShot(2000, self.check_updates)
-    
+        
         def check_updates(self):
             """Controlla aggiornamenti all'avvio"""
+            print("[LOGIN] Avvio controllo aggiornamenti...")
             update_info = check_for_updates()
             if update_info:
+                print(f"[LOGIN] Aggiornamento trovato: {update_info['version']}")
                 show_update_dialog(self, update_info)
+            else:
+                print("[LOGIN] Nessun aggiornamento disponibile")
 
     class MainWindow(QMainWindow):
+        def load_users_for_visibility(self):
+            """Carica lista utenti nella QListWidget e la combobox di assegnazione"""
+            try:
+                r = requests.get(f"{self.server_url}/get_all_users", timeout=8)
+                if r.status_code == 200:
+                    users = r.json()
+                    # lista visibilità
+                    try:
+                        self.char_visibility_list.clear()
+                    except Exception:
+                        pass
+                    # combo assegnazione
+                    try:
+                        self.char_assign_combo.clear()
+                        self.char_assign_combo.addItem(
+                            f"{user['name']} {user['surname']} ({user['email']})",
+                            user['id']
+                        )
+                    except Exception:
+                        pass
+                    for user in users:
+                        try:
+                            item = QtWidgets.QListWidgetItem(f"{user['name']} {user['surname']} ({user['email']})")
+                            item.setData(QtCore.Qt.UserRole, user['id'])
+                            self.char_visibility_list.addItem(item)
+                        except Exception:
+                            pass
+                        try:
+                            self.char_assign_combo.addItem(f"{user['name']} {user['surname']} ({user['email']})", user['id'])
+                        except Exception:
+                            pass
+            except Exception as e:
+                print(f"Errore caricamento utenti: {e}")
+
+
+        def toggle_visibility_all(self, state):
+            """Abilita/disabilita selezione utenti"""
+            # se la checkbox è selezionata -> disabilita la lista (tutti vedono)
+            self.char_visibility_list.setEnabled(state == 0)
+
+        def get_selected_users(self):
+            """Ritorna lista ID utenti selezionati"""
+            if self.char_visible_all.isChecked():
+                return ""  # vuoto = tutti
+            selected_ids = []
+            for i in range(self.char_visibility_list.count()):
+                item = self.char_visibility_list.item(i)
+                if item.isSelected():
+                    selected_ids.append(str(item.data(QtCore.Qt.UserRole)))
+            return ",".join(selected_ids)
+
+
         def __init__(self, user, server_url):
             super().__init__()
             self.user = user
@@ -1740,6 +1960,22 @@ if PYQT_AVAILABLE:
             
             self.btn_add_char = QPushButton("Crea Personaggio")
             self.btn_add_char.clicked.connect(self.add_character)
+
+            # Selezione visibilità: lista utenti e checkbox 'Visibile a tutti'
+            self.char_visible_all = QtWidgets.QCheckBox("Visibile a tutti (se selezionato, ignora la selezione utenti)")
+            self.char_visible_all.setChecked(False)
+            self.char_visible_all.stateChanged.connect(self.toggle_visibility_all)
+            self.char_visibility_list = QtWidgets.QListWidget()
+            self.char_visibility_list.setSelectionMode(QtWidgets.QAbstractItemView.MultiSelection)
+# Combo per assegnare il personaggio ad UN utente
+            self.char_assign_combo = QComboBox()
+            self.char_assign_combo.addItem('--- Nessuno ---', '')
+
+            form_add.addRow(self.char_visible_all)
+            form_add.addRow("Seleziona Utenti (Visibilità):", self.char_visibility_list)
+            form_add.addRow("Assegna a (opzionale):", self.char_assign_combo)
+
+
             form_add.addRow(self.btn_add_char)
             
             group_add.setLayout(form_add)
@@ -1767,6 +2003,11 @@ if PYQT_AVAILABLE:
             
             # Carica i personaggi esistenti
             self.load_admin_characters()
+            try:
+                self.load_users_for_visibility()
+            except Exception:
+                pass
+
             
         def select_script_file(self):
             """Seleziona file .docx del copione"""
@@ -2010,20 +2251,22 @@ if PYQT_AVAILABLE:
             script_path = self.char_script_path.text()
             img_path = self.char_img_path.text()
 
-            if not name or not role:
-                QMessageBox.warning(self, "Errore", "Nome e Ruolo sono obbligatori")
-                return
+            visible_to = self.get_selected_users()
+            try:
+                assigned_to = self.char_assign_combo.currentData()
+            except Exception:
+                assigned_to = ''
 
-            self.btn_add_char.setEnabled(False)
-            
             data = {
                 'series_title': series,
                 'character_name': name,
                 'role': role,
                 'expiry_date': expiry,
-                'created_by': self.user.get('id')
+                'created_by': self.user.get('id'),
+                'visible_to': visible_to,
+                'assigned_to': assigned_to
             }
-            
+
             files = {}
             if os.path.exists(img_path):
                 try:
@@ -2034,8 +2277,14 @@ if PYQT_AVAILABLE:
                     return
 
             try:
-                # Crea il personaggio
+                # Crea il personaggi
                 r = requests.post(f"{self.server_url}/bacheca/character", data=data, files=files, timeout=15)
+                try:
+                    for fh in files.values():
+                        fh.close()
+                except Exception:
+                    pass
+
                 
                 if r.status_code == 200 and r.json().get('status') == 'ok':
                     char_id = None

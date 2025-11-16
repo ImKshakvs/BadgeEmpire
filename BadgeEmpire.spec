@@ -5,7 +5,7 @@ a = Analysis(
     ['BadgeEmpire.py'],
     pathex=[],
     binaries=[],
-    datas=[('assets', 'assets'), ('updater.py', '.')],
+    datas=[('assets', 'assets')],
     hiddenimports=['PyQt5.QtCore', 'PyQt5.QtGui', 'PyQt5.QtWidgets', 'werkzeug', 'flask', 'requests', 'sqlite3'],
     hookspath=[],
     hooksconfig={},

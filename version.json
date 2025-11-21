@@ -1,6 +1,6 @@
 {
-  "version": "1.0.7",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.0.7/BadgeEmpire.exe",
+  "version": "1.0.8",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.0.8/BadgeEmpire.exe",
   "mandatory": false,
   "changelog": "🎉 AGGIORNAMENTO MAGGIORE v1.0.7\n\n⚠️ SISTEMA WARNING COMPLETO:\n- Gestione warning per utenti da pannello admin\n- Notifiche popup automatiche all'avvio\n- Cronologia completa warning (attivi e rimossi)\n- Contatore warning visibile nella dashboard\n- Timer di sicurezza (5 sec) per leggere le notifiche\n\n🖥️ MIGLIORAMENTI INTERFACCIA:\n- Finestra principale più ampia (1400x800px)\n- Tutte le tabelle completamente visibili\n- Pulsanti ottimizzati e proporzionati\n- Altezza righe ridotta per migliore leggibilità\n- Colonne ridimensionate per eliminare scroll orizzontale\n\n📊 GESTIONE LOG:\n- Admin può modificare ore e motivazioni direttamente\n- Eliminazione permanente con blocco reinserimento\n- Campi editabili con evidenziazione visiva\n- Conferme di sicurezza per azioni critiche\n\n🎭 BACHECA PERSONAGGI:\n- Interfaccia gestione migliorata con tab separati\n- Caricamento copioni .docx ottimizzato\n- Modifica immagini e file più intuitiva\n- Visualizzazione personaggi senza scroll laterale\n\n🔧 CORREZIONI:\n- Risolto bug duplicazione righe tabelle\n- Fix larghezza colonne admin\n- Migliorata gestione permessi visibilità\n- Ottimizzazione caricamento dati\n\n💡 ESPERIENZA UTENTE:\n- App più veloce e reattiva\n- Layout ottimizzato per schermi Full HD\n- Messaggi di errore più chiari\n- Miglior feedback visivo per azioni utente"
 }

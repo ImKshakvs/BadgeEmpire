@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.0/BadgeEmpire.exe",
+  "version": "1.1.1",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.1/BadgeEmpire.exe",
   "mandatory": false,
-  "changelog": "🎉 BadgeEmpire v1.1.0 - Calendario e Tutorial\n\n✨ NOVITÀ:\n📅 Sistema Calendario Completo (Comune + Personale + Admin)\n🎓 Tutorial Obbligatorio con Video e Quiz\n⚠️ Sistema Warning Potenziato con Notifiche\n📝 Gestione Quiz Admin con Revisione\n💾 Login Ricordato Multi-Utente\n\n🐛 BUG FIX:\n✅ Doppi inserimenti ore risolti\n✅ Eliminazione definitiva log admin\n✅ Gestione visibilità bacheca migliorata\n\n🔧 MIGLIORAMENTI:\n- Interfaccia più chiara e organizzata\n- Pulsanti e tabelle ottimizzate\n- Validazione dati migliorata"
+  "changelog": "🎉 BadgeEmpire v1.1.1 - Calendario e Tutorial\n\n✨ NOVITÀ:\n📅 Sistema Calendario Completo (Comune + Personale + Admin)\n🎓 Tutorial Obbligatorio con Video e Quiz\n⚠️ Sistema Warning Potenziato con Notifiche\n📝 Gestione Quiz Admin con Revisione\n💾 Login Ricordato Multi-Utente\n\n🐛 BUG FIX:\n✅ Doppi inserimenti ore risolti\n✅ Eliminazione definitiva log admin\n✅ Gestione visibilità bacheca migliorata\n\n🔧 MIGLIORAMENTI:\n- Interfaccia più chiara e organizzata\n- Pulsanti e tabelle ottimizzate\n- Validazione dati migliorata"
 }

@@ -1,6 +1,6 @@
 {
-  "version": "1.1.3",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.3/BadgeEmpire.exe",
+  "version": "1.1.4",
   "mandatory": false,
-  "changelog": "🎉 BadgeEmpire v1.1.3 - Calendario e Tutorial\n\n✨ NOVITÀ:\n📅 Sistema Calendario Completo (Comune + Personale + Admin)\n🎓 Tutorial Obbligatorio con Video e Quiz\n⚠️ Sistema Warning Potenziato con Notifiche\n📝 Gestione Quiz Admin con Revisione\n💾 Login Ricordato Multi-Utente\n\n🐛 BUG FIX:\n✅ Doppi inserimenti ore risolti\n✅ Eliminazione definitiva log admin\n✅ Gestione visibilità bacheca migliorata\n\n🔧 MIGLIORAMENTI:\n- Interfaccia più chiara e organizzata\n- Pulsanti e tabelle ottimizzate\n- Validazione dati migliorata"
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.4/BadgeEmpire.exe",
+  "changelog": "🎨 Interfaccia completamente rinnovata\n• Finestre con bordi arrotondati e stile moderno\n• Tema dark elegante in tutta l'applicazione\n• Top bar personalizzata con pulsanti minimizza/chiudi\n• Finestre trascinabili senza bordi di sistema\n\n📅 Calendario migliorato\n• Scritta mese/anno ora bianca e leggibile\n• Tre sezioni separate (Comune, Personale, Tutti)\n• Menu contestuale eventi con sfondo nero\n• Pulizia automatica eventi scaduti\n\n🎭 Bacheca personaggi\n• Testo nero e leggibile nei box info\n• Interfaccia coerente con il resto dell'app\n• Migliore visualizzazione immagini personaggi\n\n📚 Tutorial\n• Finestra con stile uniforme\n• Logo ingrandito per migliore visibilità\n• Esperienza utente ottimizzata\n\n🔧 Miglioramenti tecnici\n• Menu profilo con sfondo bianco e testo nero\n• Tutti i menu contestuali ora con tema consistente\n• Correzioni bug grafici minori\n• Performance ottimizzate"
 }

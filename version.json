@@ -1,8 +1,6 @@
 {
-  "version": "1.1.6",
+  "version": "1.1.7",
   "mandatory": false,
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.6/BadgeEmpire.exe",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.7/BadgeEmpire.exe",
   "changelog": "🎨 Interfaccia completamente rinnovata\n• Finestre con bordi arrotondati e stile moderno\n• Tema dark elegante in tutta l'applicazione\n• Top bar personalizzata con pulsanti minimizza/chiudi\n• Finestre trascinabili senza bordi di sistema\n\n📅 Calendario migliorato\n• Scritta mese/anno ora bianca e leggibile\n• Tre sezioni separate (Comune, Personale, Tutti)\n• Menu contestuale eventi con sfondo nero\n• Pulizia automatica eventi scaduti\n\n🎭 Bacheca personaggi\n• Testo nero e leggibile nei box info\n• Interfaccia coerente con il resto dell'app\n• Migliore visualizzazione immagini personaggi\n\n📚 Tutorial\n• Finestra con stile uniforme\n• Logo ingrandito per migliore visibilità\n• Esperienza utente ottimizzata\n\n🔧 Miglioramenti tecnici\n• Menu profilo con sfondo bianco e testo nero\n• Tutti i menu contestuali ora con tema consistente\n• Correzioni bug grafici minori\n• Performance ottimizzate"
-}
-
-      
+}     

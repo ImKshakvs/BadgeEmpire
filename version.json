@@ -1,6 +1,6 @@
 {
-  "version": "1.1.9",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.1.9/BadgeEmpire.exe",
+  "version": "1.2.0",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.2.0/BadgeEmpire.exe",
   "mandatory": false,
   "changelog": "🎨 NUOVA INTERFACCIA DI AGGIORNAMENTO\n\n✨ Novità Principali:\n• Finestra di aggiornamento frameless moderna e customizzata\n• Progress bar animata in tempo reale durante il download\n• Visualizzazione dettagliata del changelog\n• Dettagli tecnici espandibili per debugging\n• Gestione errori avanzata con rollback automatico\n• Backup automatico prima dell'installazione\n• Riavvio automatico dopo l'aggiornamento\n\n🔧 Miglioramenti Tecnici:\n• Eliminato il prompt dei comandi durante l'aggiornamento\n• Download con indicatore di progresso MB/MB\n• Verifica integrità file scaricato\n• Sistema di backup e ripristino automatico\n• Log dettagliati delle operazioni\n\n🎨 Design:\n• Interfaccia dark mode coerente con l'app\n• Animazioni fluide e transizioni smooth\n• Pulsante 'Mostra Dettagli' per utenti avanzati\n• Drag & drop della finestra\n• Bordi arrotondati e stile moderno\n\n🛡️ Sicurezza:\n• Controllo dimensione file prima dell'installazione\n• Rollback automatico in caso di errore\n• Gestione permessi file migliorata\n• Validazione URL download\n\n💡 UX:\n• Pulsante 'Più Tardi' per aggiornamenti non obbligatori\n• Messaggio di conferma prima del riavvio\n• Disabilitazione pulsanti durante operazioni critiche\n• Feedback visivo costante dello stato"
 }

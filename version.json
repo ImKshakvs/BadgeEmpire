@@ -1,6 +1,6 @@
 {
-  "version": "1.3.5",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.3.5/BadgeEmpire.exe",
+  "version": "1.3.6",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.3.6/BadgeEmpire.exe",
   "mandatory": false,
-  "changelog": "Aggiornamento generale dell'applicazione: miglioramenti al calendario personale e alla gestione dei compiti, sincronizzazione avanzata tra utenti e admin, revisione completa del sistema presenze/assenze con supporto ai ritardi, ottimizzazioni alle API del registro, miglioramenti grafici e correzione di vari bug minori."
+  "changelog": "SINCRONIZZAZIONE CON DISCORD"
 }

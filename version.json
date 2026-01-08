@@ -1,6 +1,6 @@
 {
-  "version": "1.3.6",
-  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.3.6/BadgeEmpire.exe",
+  "version": "1.4.0",
+  "download_url": "https://github.com/ImKshakvs/BadgeEmpire/releases/download/v1.4.0/BadgeEmpire.exe",
   "mandatory": false,
-  "changelog": "1.3.6"
+  "changelog": "Sistema Compiti Giornalieri: crea liste di task con slot limitati, gli utenti possono prenotare (max 1 per persona)"
 }
